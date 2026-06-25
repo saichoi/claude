@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스톱워치</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-blue-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+        <!-- 제목 -->
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">⏱️ 스톱워치</h1>
+
+        <!-- 시간 표시 -->
+        <div class="bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl p-8 mb-8 flex items-center justify-center min-h-32">
+            <div id="timeDisplay" class="text-6xl font-bold text-purple-600 font-mono">
+                00:00:00
+            </div>
+        </div>
+
+        <!-- 버튼 영역 -->
+        <div class="flex gap-4 mb-4">
+            <!-- 시작/일시정지 버튼 -->
+            <button
+                id="startPauseBtn"
+                class="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-bold py-4 px-6 rounded-lg transition transform hover:scale-105 active:scale-95"
+            >
+                시작
+            </button>
+
+            <!-- 리셋 버튼 -->
+            <button
+                id="resetBtn"
+                class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg transition transform hover:scale-105 active:scale-95"
+            >
+                리셋
+            </button>
+        </div>
+
+        <!-- 상태 표시 -->
+        <div id="statusMessage" class="text-center text-sm text-gray-500 mt-4">
+            준비 완료
+        </div>
+    </div>
+
+    <script>
+        // 상태 관리
+        let elapsedTime = 0; // 경과 시간 (밀리초)
+        let isRunning = false; // 실행 중인지 여부
+        let intervalId = null; // setInterval의 ID (나중에 정지할 때 사용)
+
+        const timeDisplay = document.getElementById('timeDisplay');
+        const startPauseBtn = document.getElementById('startPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // 경과 시간을 "00:00:00" 형식으로 변환
+        function formatTime(ms) {
+            // 전체 초 계산 (1000ms = 1초)
+            const totalSeconds = Math.floor(ms / 1000);
+
+            // 시, 분, 초 각각 계산
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            // 각 값을 두 자리 숫자로 변환 (예: 5 → "05")
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // 화면에 시간 업데이트
+        function updateDisplay() {
+            timeDisplay.textContent = formatTime(elapsedTime);
+        }
+
+        // 시작/일시정지 함수
+        function toggleStartPause() {
+            if (isRunning) {
+                // 일시정지
+                clearInterval(intervalId);
+                isRunning = false;
+                startPauseBtn.textContent = '시작';
+                startPauseBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                startPauseBtn.classList.add('bg-purple-500', 'hover:bg-purple-600');
+                statusMessage.textContent = '일시정지됨';
+            } else {
+                // 시작
+                isRunning = true;
+                startPauseBtn.textContent = '일시정지';
+                startPauseBtn.classList.remove('bg-purple-500', 'hover:bg-purple-600');
+                startPauseBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+                statusMessage.textContent = '실행 중...';
+
+                // 100ms마다 시간을 증가 (부드러운 움직임)
+                intervalId = setInterval(() => {
+                    elapsedTime += 100;
+                    updateDisplay();
+                }, 100);
+            }
+        }
+
+        // 리셋 함수
+        function reset() {
+            clearInterval(intervalId);
+            elapsedTime = 0;
+            isRunning = false;
+            startPauseBtn.textContent = '시작';
+            startPauseBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+            startPauseBtn.classList.add('bg-purple-500', 'hover:bg-purple-600');
+            statusMessage.textContent = '준비 완료';
+            updateDisplay();
+        }
+
+        // 이벤트 리스너 등록
+        startPauseBtn.addEventListener('click', toggleStartPause);
+        resetBtn.addEventListener('click', reset);
+
+        // 초기 화면 표시
+        updateDisplay();
+    </script>
+</body>
+</html>

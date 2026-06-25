@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>오늘의 운세</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-1: #0a0a1f;
+    --bg-2: #1a0a2e;
+    --bg-3: #16213e;
+    --gold: #d4af37;
+    --gold-soft: #f0d97a;
+    --purple-glow: rgba(155, 89, 255, 0.45);
+    --text: #f0e6ff;
+    --text-dim: #a89dc4;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: 'Noto Serif KR', serif;
+    color: var(--text);
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(155, 89, 255, 0.18), transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(212, 175, 55, 0.10), transparent 50%),
+      linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    position: relative;
+  }
+
+  /* 별 배경 */
+  .stars, .stars::before, .stars::after {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .stars {
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+      radial-gradient(1px 1px at 30% 70%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 50% 40%, #fff, transparent),
+      radial-gradient(1px 1px at 70% 10%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 85% 60%, #fff, transparent),
+      radial-gradient(1px 1px at 90% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 25% 85%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 60% 90%, #fff, transparent),
+      radial-gradient(1px 1px at 45% 15%, #fff, transparent),
+      radial-gradient(1px 1px at 5% 55%, #fff, transparent);
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+  .stars::before {
+    content: '';
+    background-image:
+      radial-gradient(1px 1px at 15% 45%, #d4af37, transparent),
+      radial-gradient(1px 1px at 75% 25%, #d4af37, transparent),
+      radial-gradient(1px 1px at 35% 80%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 95% 75%, #d4af37, transparent),
+      radial-gradient(1px 1px at 55% 5%, #fff, transparent);
+    animation: twinkle 6s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes twinkle {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    letter-spacing: 0.15em;
+    background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 24px rgba(212, 175, 55, 0.3);
+    margin-bottom: 6px;
+  }
+  header p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* 카드 */
+  .card-wrap {
+    perspective: 1200px;
+    width: 220px;
+    height: 340px;
+  }
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.4, 0.0, 0.2, 1);
+    cursor: pointer;
+  }
+  .card.flipped {
+    transform: rotateY(180deg);
+  }
+  .card-wrap:hover .card:not(.flipped) {
+    transform: translateY(-6px) rotateZ(-1deg);
+  }
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 14px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--gold);
+    box-shadow:
+      0 0 30px var(--purple-glow),
+      0 0 60px rgba(212, 175, 55, 0.15),
+      inset 0 0 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+  }
+  .card-back {
+    background:
+      radial-gradient(circle at center, #2a1a4a 0%, #0f0820 70%);
+  }
+  .card-back-pattern {
+    width: 80%;
+    height: 80%;
+    border: 1px solid rgba(212, 175, 55, 0.6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .card-back-pattern::before,
+  .card-back-pattern::after {
+    content: '';
+    position: absolute;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 6px;
+  }
+  .card-back-pattern::before {
+    inset: 8px;
+  }
+  .card-back-pattern::after {
+    inset: 16px;
+  }
+  .card-back-symbol {
+    font-size: 3.5rem;
+    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .card-front {
+    background:
+      radial-gradient(circle at top, #3a1f5c 0%, #1a0a2e 70%);
+    transform: rotateY(180deg);
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 18px;
+  }
+  .card-emoji {
+    font-size: 5rem;
+    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.7));
+  }
+  .card-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-align: center;
+  }
+
+  /* 메시지 */
+  .message {
+    min-height: 84px;
+    max-width: 460px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    padding: 0 12px;
+  }
+  .message.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .message p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  /* 버튼 */
+  .btn {
+    font-family: 'Cinzel', serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-soft);
+    background: linear-gradient(135deg, rgba(58, 31, 92, 0.8), rgba(26, 10, 46, 0.8));
+    border: 1.5px solid var(--gold);
+    padding: 14px 36px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow:
+      0 0 20px var(--purple-glow),
+      inset 0 0 10px rgba(212, 175, 55, 0.1);
+    text-transform: uppercase;
+  }
+  .btn:hover {
+    background: linear-gradient(135deg, rgba(78, 41, 122, 0.9), rgba(46, 20, 76, 0.9));
+    box-shadow:
+      0 0 32px var(--purple-glow),
+      0 0 50px rgba(212, 175, 55, 0.25),
+      inset 0 0 12px rgba(212, 175, 55, 0.2);
+    transform: translateY(-2px);
+    color: #fff;
+  }
+  .btn:active {
+    transform: translateY(0);
+  }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  footer {
+    margin-top: 8px;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 480px) {
+    .card-wrap { width: 200px; height: 310px; }
+    .card-emoji { font-size: 4.2rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <main class="container">
+    <header>
+      <h1>오늘의 운세</h1>
+      <p>마음을 비우고 카드를 선택하세요</p>
+    </header>
+
+    <div class="card-wrap" id="cardWrap">
+      <div class="card" id="card">
+        <div class="card-face card-back">
+          <div class="card-back-pattern">
+            <span class="card-back-symbol">✦</span>
+          </div>
+        </div>
+        <div class="card-face card-front">
+          <div class="card-emoji" id="cardEmoji">✨</div>
+          <div class="card-name" id="cardName">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="message" id="message" aria-live="polite">
+      <p id="messageText"></p>
+    </div>
+
+    <button class="btn" id="drawBtn">운세 뽑기</button>
+
+    <footer>✦ Mystical Fortune ✦</footer>
+  </main>
+
+<script>
+  const cards = [
+    { name: '태양', emoji: '☀️', message: '오늘은 빛나는 하루! 자신감을 가지고 행동하면 좋은 결과가 따라옵니다.' },
+    { name: '달',   emoji: '🌙', message: '직감을 믿으세요. 평소 무시했던 작은 신호 속에 답이 숨어 있습니다.' },
+    { name: '별',   emoji: '⭐', message: '오랫동안 품어온 소망이 이루어질 조짐. 희망을 놓지 마세요.' },
+    { name: '연인', emoji: '💕', message: '관계 속에서 따뜻함을 발견하는 날. 가까운 사람에게 마음을 전하세요.' },
+    { name: '마법사', emoji: '🔮', message: '당신의 의지가 현실을 바꿉니다. 미루던 일을 시작하기 좋은 날.' },
+    { name: '운명의 수레바퀴', emoji: '🎡', message: '예상치 못한 변화가 찾아옵니다. 흐름에 몸을 맡겨보세요.' },
+    { name: '여황제', emoji: '👑', message: '풍요와 안정의 기운. 자신을 돌보는 시간을 가지세요.' },
+    { name: '세계', emoji: '🌍', message: '한 챕터가 완성되는 날. 그동안의 노력이 결실을 맺습니다.' },
+  ];
+
+  const cardEl       = document.getElementById('card');
+  const cardEmojiEl  = document.getElementById('cardEmoji');
+  const cardNameEl   = document.getElementById('cardName');
+  const messageEl    = document.getElementById('message');
+  const messageTextEl= document.getElementById('messageText');
+  const drawBtn      = document.getElementById('drawBtn');
+
+  let isFlipped = false;
+  let lastIndex = -1;
+
+  function pickRandomCard() {
+    let idx = Math.floor(Math.random() * cards.length);
+    // 같은 카드 연속 방지 (8장이라 가능)
+    if (idx === lastIndex) {
+      idx = (idx + 1) % cards.length;
+    }
+    lastIndex = idx;
+    return cards[idx];
+  }
+
+  function drawCard() {
+    if (isFlipped) {
+      // 다시 뽑기 → 일단 뒷면으로 되돌렸다가 새 카드로 뒤집기
+      reset(() => setTimeout(drawCard, 350));
+      return;
+    }
+
+    const card = pickRandomCard();
+    cardEmojiEl.textContent = card.emoji;
+    cardNameEl.textContent  = card.name;
+    messageTextEl.textContent = card.message;
+
+    cardEl.classList.add('flipped');
+    isFlipped = true;
+    drawBtn.disabled = true;
+
+    // 카드 뒤집힌 뒤 메시지 표시
+    setTimeout(() => {
+      messageEl.classList.add('show');
+      drawBtn.textContent = '다시 뽑기';
+      drawBtn.disabled = false;
+    }, 700);
+  }
+
+  function reset(done) {
+    cardEl.classList.remove('flipped');
+    messageEl.classList.remove('show');
+    isFlipped = false;
+    if (typeof done === 'function') done();
+  }
+
+  drawBtn.addEventListener('click', drawCard);
+  cardEl.addEventListener('click', () => { if (!isFlipped) drawCard(); });
+</script>
+</body>
+</html>

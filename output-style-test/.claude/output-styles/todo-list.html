@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>할 일 목록</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen py-8 px-4">
+    <div class="max-w-md mx-auto">
+        <!-- 카드 컨테이너 -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">📝 할 일 목록</h1>
+
+            <!-- 입력 영역 -->
+            <div class="flex gap-2 mb-6">
+                <input
+                    type="text"
+                    id="todoInput"
+                    placeholder="할 일을 입력하세요..."
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button
+                    id="addBtn"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold transition"
+                >
+                    추가
+                </button>
+            </div>
+
+            <!-- 할 일 목록 -->
+            <ul id="todoList" class="space-y-2">
+                <!-- 여기에 할 일 항목이 동적으로 추가됩니다 -->
+            </ul>
+
+            <!-- 빈 상태 메시지 -->
+            <div id="emptyMessage" class="text-center text-gray-400 py-8">
+                할 일을 추가해보세요 ✨
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 데이터를 저장할 배열 (새로고침해도 유지되도록 localStorage 사용)
+        let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+        const todoInput = document.getElementById('todoInput');
+        const addBtn = document.getElementById('addBtn');
+        const todoList = document.getElementById('todoList');
+        const emptyMessage = document.getElementById('emptyMessage');
+
+        // 할 일 추가 함수
+        function addTodo() {
+            const text = todoInput.value.trim();
+            if (text === '') return; // 빈 입력은 무시
+
+            // 새로운 할 일 객체 생성
+            const todo = {
+                id: Date.now(), // 고유한 ID (현재 시간 사용)
+                text: text,
+                completed: false
+            };
+
+            todos.push(todo);
+            saveTodos();
+            renderTodos();
+            todoInput.value = ''; // 입력 필드 초기화
+            todoInput.focus(); // 커서를 다시 입력 필드로 이동
+        }
+
+        // 할 일 완료 토글 함수
+        function toggleTodo(id) {
+            todos = todos.map(todo =>
+                todo.id === id ? { ...todo, completed: !todo.completed } : todo
+            );
+            saveTodos();
+            renderTodos();
+        }
+
+        // 할 일 삭제 함수
+        function deleteTodo(id) {
+            todos = todos.filter(todo => todo.id !== id);
+            saveTodos();
+            renderTodos();
+        }
+
+        // localStorage에 저장
+        function saveTodos() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        // 화면에 렌더링
+        function renderTodos() {
+            todoList.innerHTML = ''; // 기존 목록 초기화
+
+            if (todos.length === 0) {
+                emptyMessage.classList.remove('hidden');
+            } else {
+                emptyMessage.classList.add('hidden');
+            }
+
+            // 각 할 일을 화면에 표시
+            todos.forEach(todo => {
+                const li = document.createElement('li');
+                li.class = 'flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition';
+
+                // 체크박스
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = todo.completed;
+                checkbox.class = 'w-5 h-5 text-indigo-500 rounded cursor-pointer';
+                checkbox.addEventListener('change', () => toggleTodo(todo.id));
+
+                // 할 일 텍스트
+                const span = document.createElement('span');
+                span.textContent = todo.text;
+                span.class = `flex-1 ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'}`;
+
+                // 삭제 버튼
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '🗑️';
+                deleteBtn.class = 'text-gray-400 hover:text-red-500 transition';
+                deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
+
+                // 요소들을 li에 추가
+                li.appendChild(checkbox);
+                li.appendChild(span);
+                li.appendChild(deleteBtn);
+                todoList.appendChild(li);
+            });
+        }
+
+        // 이벤트 리스너 등록
+        addBtn.addEventListener('click', addTodo);
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTodo(); // Enter 키로도 추가 가능
+        });
+
+        // 초기 렌더링
+        renderTodos();
+    </script>
+</body>
+</html>
